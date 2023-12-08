@@ -2,11 +2,9 @@
 #Author : Cipher007
 
 # To-do : 
-# - Fix the file content error
+# - Put output to a file and cat it!
 # - Add in date range
 # - Add option for system dirs
-# - Add a macro checker option
-# - Support for multiple directories
 
 
 import havocui
@@ -20,6 +18,7 @@ select_demon = None
 dir_to_search = "C:\\Users\\"
 filetypes = ".txt"
 check_contents = False
+check_macros = False
 keywords = "pass*"
 keywords_dict = "pass*"
 extensions_dict = ".txt"
@@ -47,6 +46,10 @@ def func_check_contents():
     global check_contents
     check_contents = not check_contents
 
+def func_check_macros():
+    global check_macros
+    check_macros = not check_macros
+
 def add_keywords(text):
     global keywords
     global keywords_dict
@@ -64,6 +67,7 @@ def run_sauron():
     global keywords
     global check_contents
     global dir_to_search
+    global check_macros
 
     contents = ""
     #cwd = os.getcwd()
@@ -75,11 +79,14 @@ def run_sauron():
     if check_contents:
         contents = "--contents"
 
+    if check_macros:
+        macros = "--vbamacrocheck"
+
     TaskID = select_demon.ConsoleWrite( select_demon.CONSOLE_TASK, "Tasked demon to run SauronEye!" )
 
-    query = f"-d {dir_to_search} --filetypes {filetypes} {contents} --keywords {keywords}"
+    query = f"-d {dir_to_search} --filetypes {filetypes} {contents} {macros} --keywords {keywords}"
     select_demon.Command(TaskID, "dotnet inline-execute %s/SauronEye.exe %s" % (cwd,query))
-
+    #select_demon.DotnetInlineExecute(TaskID, "%s/SauronEye.exe" % cwd, "%s" % query)
 
 def sauroneye():
     sauron_eye.clear()
@@ -90,9 +97,10 @@ def sauroneye():
     sauron_eye.addLabel("<span style='color:#71e0cb'>Folder to start search:</span>")
     sauron_eye.addLineedit(dir_to_search, set_directory)
     sauron_eye.addCheckbox("Search file contents", func_check_contents)
-    sauron_eye.addLabel("<span style='color:#71e0cb'>File types:</span>")
+    sauron_eye.addCheckbox("Check for macros in .doc and .xls files", func_check_macros)
+    sauron_eye.addLabel("<span style='color:#71e0cb'>File types seperated by a space:</span>")
     sauron_eye.addLineedit(extensions_dict, add_extensions)
-    sauron_eye.addLabel("<span style='color:#71e0cb'>Add keywords to search for seperated by a comma:</span>")
+    sauron_eye.addLabel("<span style='color:#71e0cb'>Add keywords to search for seperated by a space:</span>")
     sauron_eye.addLineedit(keywords_dict, add_keywords)
 
     sauron_eye.addButton("Start", run_sauron)
