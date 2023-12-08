@@ -80,8 +80,8 @@ def run_sauron():
     filesystem = "" 
     contents = ""
     macros = ""
-    #cwd = os.getcwd()
-    cwd = "/home/cipher/Github/havoc-SauronEye"
+    cwd = os.getcwd()
+    cwd += "/data/extensions/havoc-SauronEye"
     if select_demon is None:
         havocui.messagebox("ERROR", "Please select a demon!")
         return
