@@ -4,8 +4,6 @@
 # To-do : 
 # - Put output to a file and cat it!
 # - Add in date range
-# - Add option for system dirs
-
 
 import havocui
 import havoc
@@ -19,6 +17,7 @@ dir_to_search = "C:\\Users\\"
 filetypes = ".txt"
 check_contents = False
 check_macros = False
+check_filesystem = False
 keywords = "pass*"
 keywords_dict = "pass*"
 extensions_dict = ".txt"
@@ -46,6 +45,10 @@ def func_check_contents():
     global check_contents
     check_contents = not check_contents
 
+def func_check_filesystem():
+    global check_filesystem
+    check_filesystem = not check_filesystem
+
 def func_check_macros():
     global check_macros
     check_macros = not check_macros
@@ -68,6 +71,7 @@ def run_sauron():
     global check_contents
     global dir_to_search
     global check_macros
+    global check_filesystem
 
     contents = ""
     #cwd = os.getcwd()
@@ -82,9 +86,12 @@ def run_sauron():
     if check_macros:
         macros = "--vbamacrocheck"
 
+    if check_filesystem:
+        filesystem = "--systemdirs"
+
     TaskID = select_demon.ConsoleWrite( select_demon.CONSOLE_TASK, "Tasked demon to run SauronEye!" )
 
-    query = f"-d {dir_to_search} --filetypes {filetypes} {contents} {macros} --keywords {keywords}"
+    query = f"-d {dir_to_search} --filetypes {filetypes} {contents} {macros} {filesystem} --keywords {keywords}"
     select_demon.Command(TaskID, "dotnet inline-execute %s/SauronEye.exe %s" % (cwd,query))
     #select_demon.DotnetInlineExecute(TaskID, "%s/SauronEye.exe" % cwd, "%s" % query)
 
@@ -98,6 +105,7 @@ def sauroneye():
     sauron_eye.addLineedit(dir_to_search, set_directory)
     sauron_eye.addCheckbox("Search file contents", func_check_contents)
     sauron_eye.addCheckbox("Check for macros in .doc and .xls files", func_check_macros)
+    sauron_eye.addCheckbox("Search in \%APPDATA% and \%WINDOWS%", func_check_filesystem)
     sauron_eye.addLabel("<span style='color:#71e0cb'>File types seperated by a space:</span>")
     sauron_eye.addLineedit(extensions_dict, add_extensions)
     sauron_eye.addLabel("<span style='color:#71e0cb'>Add keywords to search for seperated by a space:</span>")
