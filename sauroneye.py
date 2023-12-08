@@ -3,7 +3,6 @@
 
 # To-do : 
 # - Put output to a file and cat it!
-# - Add in date range
 
 import havocui
 import havoc
@@ -18,6 +17,7 @@ filetypes = ".txt"
 check_contents = False
 check_macros = False
 check_filesystem = False
+use_daterange = False
 keywords = "pass*"
 keywords_dict = "pass*"
 extensions_dict = ".txt"
@@ -44,6 +44,10 @@ def get_demon(num):
 def func_check_contents():
     global check_contents
     check_contents = not check_contents
+
+def func_use_daterange():
+    global use_daterange
+    use_daterange = not use_daterange
 
 def func_check_filesystem():
     global check_filesystem
@@ -72,8 +76,10 @@ def run_sauron():
     global dir_to_search
     global check_macros
     global check_filesystem
-
+    
+    filesystem = "" 
     contents = ""
+    macros = ""
     #cwd = os.getcwd()
     cwd = "/home/cipher/Github/havoc-SauronEye"
     if select_demon is None:
@@ -103,9 +109,9 @@ def sauroneye():
     sauron_eye.addCombobox(get_demon, "Select demon", *demons)
     sauron_eye.addLabel("<span style='color:#71e0cb'>Folder to start search:</span>")
     sauron_eye.addLineedit(dir_to_search, set_directory)
-    sauron_eye.addCheckbox("Search file contents", func_check_contents)
+    #sauron_eye.addCheckbox("Search file contents", func_check_contents)
     sauron_eye.addCheckbox("Check for macros in .doc and .xls files", func_check_macros)
-    sauron_eye.addCheckbox("Search in \%APPDATA% and \%WINDOWS%", func_check_filesystem)
+    sauron_eye.addCheckbox("Search in %APPDATA% and %WINDOWS%", func_check_filesystem)
     sauron_eye.addLabel("<span style='color:#71e0cb'>File types seperated by a space:</span>")
     sauron_eye.addLineedit(extensions_dict, add_extensions)
     sauron_eye.addLabel("<span style='color:#71e0cb'>Add keywords to search for seperated by a space:</span>")
